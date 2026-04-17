@@ -17,7 +17,6 @@
             scroll-behavior: smooth;
         }
 
-        /* ===== 背景與畫布 ===== */
         .background {
             position: fixed;
             width: 100%;
@@ -64,20 +63,26 @@
 
         @keyframes blink-cursor { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-        .quiz-link {
-            margin-top: 40px;
+        /* 按鈕容器 */
+        .banner-buttons { margin-top: 40px; z-index: 10; }
+
+        .quiz-link, .shop-link {
             font-size: 0.9rem;
-            color: #98e2dc;
             text-decoration: none;
             opacity: 0.6;
-            border: 1px solid #98e2dc;
             padding: 8px 24px;
             border-radius: 20px;
             transition: 0.3s;
-            z-index: 10;
+            display: inline-block;
+            margin: 8px; /* 增加一點間距 */
         }
 
+        .quiz-link { color: #98e2dc; border: 1px solid #98e2dc; }
         .quiz-link:hover { opacity: 1; background: rgba(152, 226, 220, 0.1); }
+
+        /* 記憶採集站按鈕 */
+        .shop-link { color: #f1d5a5; border: 1px solid #f1d5a5; }
+        .shop-link:hover { opacity: 1; background: rgba(241, 213, 165, 0.1); }
 
         .scroll-hint {
             position: absolute;
@@ -124,7 +129,6 @@
         .book h3 { margin-top: 30px; font-size: 1.5rem; color: #98e2dc; letter-spacing: 3px; }
         .book p { font-size: 0.95rem; opacity: 0.6; margin-top: 12px; }
 
-        /* ===== 音樂與底部 ===== */
         .music-btn {
             position: fixed;
             bottom: 30px;
@@ -140,6 +144,32 @@
         }
 
         footer { text-align: center; font-size: 12px; opacity: 0.4; padding: 80px 0 40px; }
+
+        /* 手機版按鈕堆疊調整 */
+        @media screen and (max-width: 480px) {
+            .quiz-link, .shop-link { display: block; margin: 15px auto; width: fit-content; }
+        }
+
+        /* Vol. 0 專屬低調樣式 */
+.book.vol-zero {
+    opacity: 0.5; /* 平時更透明 */
+    transition: 0.8s;
+}
+
+.book.vol-zero:hover {
+    opacity: 1; /* 鼠標移上去才顯現 */
+}
+
+.book.vol-zero img {
+    filter: grayscale(80%); /* 帶點黑白感，不搶色 */
+    max-width: 200px; /* 比一般的書稍微縮小一點 */
+    border: 1px dashed rgba(152, 226, 220, 0.4); /* 使用虛線邊框 */
+}
+
+.book.vol-zero h3 {
+    font-size: 1.2rem;
+    color: rgba(152, 226, 220, 0.7);
+}
     </style>
 </head>
 <body>
@@ -156,7 +186,12 @@
         <h1 class="title"><span id="title"></span><span class="cursor"></span></h1>
         <p class="subtitle" id="subtitle"></p>
     </div>
-    <a href="https://9201227-hub.github.io/Emotional-Boundaries-Personality-Test/" class="quiz-link">← 直探你內心的想法?</a>
+    
+    <div class="banner-buttons">
+        <a href="https://9201227-hub.github.io/Emotional-Boundaries-Personality-Test/" class="quiz-link">← 直探你內心的想法?</a>
+        <a href="https://9201227-hub.github.io/Merchandise-Area-Memory-Archive-Station/" class="shop-link">前往記憶採集站 →</a>
+    </div>
+
     <a href="#first-book" class="scroll-hint" id="scrollHint">
         <span>SCROLL</span>
         <div class="arrow"></div>
@@ -193,12 +228,21 @@
     </div>
 </section>
 
+<section class="scroll-reveal" style="padding: 150px 20px;"> <div class="book vol-zero" style="border: none;">
+        <a href="https://www.youtube.com/@BelongingorCage" target="_blank" style="text-decoration: none;">
+            <div style="font-size: 10px; letter-spacing: 4px; color: rgba(152, 226, 220, 0.5); margin-bottom: 20px;">[ 進入影像檔案 ]</div>
+            <h3 style="font-size: 1.5rem; letter-spacing: 5px; color: #98e2dc; margin: 0; text-shadow: 0 0 10px rgba(152, 226, 220, 0.5);">Vol. 0 迴聲</h3>
+        </a>
+        <p style="font-size: 0.85rem; margin-top: 15px; color: rgba(152, 226, 220, 0.6);">在群體的微笑裡，我找回了自己的聲音。</p>
+    </div>
+</section>
+
 <div class="music-btn" onclick="toggleMusic()" id="musicBtn">音樂 OFF</div>
 
 <footer>© 2026 歸屬，或囚籠．All Rights Reserved.</footer>
 
 <script>
-/* ===== 打字效果 ===== */
+/* JavaScript 邏輯部分（打字效果、螢火蟲、音樂音量 0.3）皆已包含在內 */
 const titleText = "歸屬，或囚籠";
 const subtitleText = "當光線開始扭曲，你聽見的是誰的聲音？";
 const titleEl = document.getElementById("title");
@@ -227,14 +271,11 @@ window.onload = () => {
     });
 };
 
-/* ===== 螢火蟲粒子系統 ===== */
+/* 螢火蟲粒子系統 */
 const canvas = document.getElementById('fireflies');
 const ctx = canvas.getContext('2d');
 let particles = [];
 let mouse = { x: null, y: null, active: false };
-
-const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-const particleCount = isMobile ? 120 : 200;
 
 function resize() {
     canvas.width = window.innerWidth;
@@ -311,7 +352,8 @@ class Particle {
 
 function initParticles() {
     particles = [];
-    for (let i = 0; i < particleCount; i++) particles.push(new Particle());
+    const count = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ? 120 : 200;
+    for (let i = 0; i < count; i++) particles.push(new Particle());
 }
 function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -321,20 +363,15 @@ function animate() {
 initParticles();
 animate();
 
-/* ===== 音樂邏輯（音量設為 0.3） ===== */
+/* 音樂與音量控制 */
 const bgm = document.getElementById("bgm");
 const btn = document.getElementById("musicBtn");
-
-// 這裡設定全域音量
 bgm.volume = 0.3; 
 
 let playing = localStorage.getItem("musicPlaying") === "true";
 
 function updateUI() { btn.innerText = playing ? "音樂 ON" : "音樂 OFF"; }
-
-if (playing) { 
-    bgm.play().catch(() => { playing = false; updateUI(); }); 
-}
+if (playing) { bgm.play().catch(() => { playing = false; updateUI(); }); }
 updateUI();
 
 function toggleMusic() {
