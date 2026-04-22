@@ -114,6 +114,58 @@ body {
         height: 100vh;
     }
 }
+/* ===== 結局遮罩組件 (End Overlay Component) ===== */
+.end-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.95); /* 接近全黑，營造沉重感 */
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    z-index: 200; /* 確保在最上層 */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 1.5s ease;
+}
+
+.end-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.end-title {
+    font-size: 1.2rem;
+    letter-spacing: 4px;
+    line-height: 2;
+    margin-bottom: 35px;
+}
+
+.end-choices {
+    display: flex;
+    gap: 25px;
+}
+
+.end-btn {
+    padding: 12px 35px;
+    border: 1px solid rgba(141, 247, 241, 0.8);
+    color: #8df7f1;
+    text-decoration: none;
+    border-radius: 25px;
+    font-size: 14px;
+    letter-spacing: 2px;
+    transition: 0.3s ease;
+    background: transparent;
+}
+
+.end-btn:hover {
+    background: rgba(141, 247, 241, 0.15);
+    box-shadow: 0 0 20px rgba(141, 247, 241, 0.4);
+    transform: translateY(-2px);
+}
 </style>
 </head>
 
@@ -164,6 +216,17 @@ body {
             <img src="127.png" class="page">
             <img src="128.png" class="page">
 
+            <div class="end-overlay" id="endOverlay">
+            <div class="end-title">
+              然而，你呢？<br>
+              你會做出怎樣的選擇？
+             </div>
+             <div class="end-choices">
+               <a href="https://9201227-hub.github.io/Emotional-Boundaries-Personality-Test/" class="end-btn">認識「我」</a>
+               <a href="index.html" class="end-btn">認識「他」</a>
+            </div>
+            </div>
+
             <div class="nav left" onclick="prevPage()"></div>
             <div class="nav right" onclick="nextPage()"></div>
 
@@ -200,16 +263,24 @@ function showPage(index) {
     pages[index].classList.add("active");
 }
 
-/* 翻頁 */
+/* 修改後的翻頁邏輯 */
 function nextPage() {
     if (current < pages.length - 1) {
         current++;
         showPage(current);
+    } else {
+        // 在最後一頁點擊「下一頁」或向左滑動時，顯示結局遮罩
+        document.getElementById("endOverlay").classList.add("visible");
     }
 }
 
 function prevPage() {
-    if (current > 0) {
+    const endOverlay = document.getElementById("endOverlay");
+    
+    // 如果現在正顯示結局遮罩，點擊「上一頁」或向右滑動時，關閉遮罩回到最後一頁
+    if (endOverlay.classList.contains("visible")) {
+        endOverlay.classList.remove("visible");
+    } else if (current > 0) {
         current--;
         showPage(current);
     }
